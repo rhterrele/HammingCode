@@ -90,9 +90,12 @@ def decodeer(invoer): #Als invoer, geef een vector van 7 binaire getallen
 
 def corrigeren(invoer): #Als invoer, geef een vector van 7 getallen die voorkomt uit de codeer functie waar maximaal 1 bit in is veranderd 
     R = Matrix([[1,0,0],[0,1,0],[1,1,0],[0,0,1],[1,0,1],[0,1,1],[1,1,1]])
-    if str(R*invoer) == str(Matrix([[0,0,0]])): 
+    lijst = (R*invoer).matrix 
+    lengte = len(lijst[0])
+    Nul = Matrix([lengte*[0]])
+    if (R*invoer).matrix == Nul.matrix: 
         return invoer #Als geen bit in de vector is verandert, krijg je de invoer terug   
     else:  
-        locatie_fout = int(R*invoer.matrix[0][2] + R*invoer.matrix[0][1] + R*invoer.matrix[0][0], 2)
+        locatie_fout = int(str((R*invoer).matrix[0][2]) + str((R*invoer).matrix[0][1]) + str((R*invoer).matrix[0][0]), 2)
         herstelling = Matrix([(locatie_fout-1)*[0]+[1]+(7-locatie_fout)*[0]])
         return invoer + herstelling #Als er ergens een fout is gemaakt, wordt de locatie van deze fout gevonden en gecorrigeert
