@@ -89,6 +89,40 @@ def maak_fouten(self, aantal): #invoer is een matrix c.q. vector met de te verze
             else:
                 self.rijen[i][0]=0
         return self #code met fouten, als matrix
+    
+ def Hamming_matrices(lengcode, lengbericht): #Ga ervanuit dat standaardmatrices geïmplementeerd zijn
+    
+    H= Matrix(lengcode-lengbericht, lengcode) #nulmatrix
+    for n in range(H.dim[0]): #gaat rijen langs
+        pbit= 2**n
+        for i in range(pbit, H.dim[1], 2*pbit): #gaat elementen van rij n langs
+            for j in range(i, i+pbit): #maakt pbit achtereenvolgende elementen 1
+                H.rijen[n][j]=1
+    """Ik denk dat H werkt als de opzet van de klasse anders is, 
+    ik heb het nog niet getest."""
+    
+    G= Matrix(lengcode, lengbericht)
+    n=0 #houdt aantal keer pbit bij = rij van H
+    j=0 #houdt aantal keer databit bij
+    for k in range(lengcode):#ofwel aantal rijen
+        if k==2**n:
+            macht_in_rij=1
+            i_H=0
+            for i in range(lengbericht): #ofwel aantal kolommen
+                while i <= macht_in_rij:
+                    macht_in_rij = macht_in_rij * 2
+                    i_H+=1
+                G.rijen[k][i]=H.rijen[n][i_H]
+                    
+            """Denk dat G en H ongeveer kloppen, 
+            nog niet heel goed nagekeken of getest."""
+            n+=1
+        else:
+            for i in range(lengbericht):
+                if i==j:
+                    G.rijen[k][i]=1 #anders blijft 0, "eenheid"
+                j+=1
+    return G, H
 
 def codeer(invoer): #Als invoer, geen een vector van 4 binaire getallen
     C = Matrix([[1,1,1,0,0,0,0],[1,0,0,1,1,0,0],[0,1,0,1,0,1,0],[1,1,0,1,0,0,1]])
