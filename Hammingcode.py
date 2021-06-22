@@ -58,30 +58,25 @@ class Matrix:
         return Matrix(product)
         
     
-def nulmatrix(n, m):
-    kolommen = n * [0]
-    nulmatrix = m * [kolommen]
-    return Matrix(nulmatrix)
+    def nulmatrix(n, m):
+        kolommen = n * [0]
+        nulmatrix = m * [kolommen]
+        return Matrix(nulmatrix)
 
-def matrixappend(matrix, n, m):
-    nieuwmatrix = []
-    print(matrix.matrix)
-    for kolom in range(matrix.dim[1]):
-        nieuwmatrix.append([])
-        for rij in range(matrix.dim[0]):
-            if kolom == m and rij == n:
-                nieuwmatrix[kolom].append(1)
-            else:
-                nieuwmatrix[kolom].append(matrix.matrix[kolom][rij])
+    def matrixappend(matrix, n, m):
+        nieuwmatrix = []
+        print(matrix.matrix)
+        for kolom in range(matrix.dim[1]):
+            nieuwmatrix.append([])
+            for rij in range(matrix.dim[0]):
+                if kolom == m and rij == n:
+                    nieuwmatrix[kolom].append(1)
+                else:
+                    nieuwmatrix[kolom].append(matrix.matrix[kolom][rij])
     
-    return Matrix(nieuwmatrix)
+        return Matrix(nieuwmatrix)
 
-
-t = nulmatrix(5,6)
-
-print(matrixappend(t, 2,3))
-
-def maak_fouten(self, aantal): #invoer is een matrix c.q. vector met de te verzenden Hamming code
+    def maak_fouten(self, aantal): #invoer is een matrix c.q. vector met de te verzenden Hamming code
         indices = random.sample(range(self.dim[0]), k=aantal) #hier wordt bepaald waar de fouten komen
         for i in indices:
             if self.rijen[i][0]==0:
@@ -89,6 +84,12 @@ def maak_fouten(self, aantal): #invoer is een matrix c.q. vector met de te verze
             else:
                 self.rijen[i][0]=0
         return self #code met fouten, als matrix
+
+t = nulmatrix(5,6)
+
+print(matrixappend(t, 2,3))
+
+
     
  def Hamming_matrices(lengcode, lengbericht): #Ga ervanuit dat standaardmatrices geïmplementeerd zijn
     
