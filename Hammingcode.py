@@ -75,10 +75,24 @@ def matrixappend(matrix, n, m):
     
     return Matrix(nieuwmatrix)
 
-    
-
 
 t = nulmatrix(5,6)
 
 print(matrixappend(t, 2,3))
 
+def codeer(invoer): #Als invoer, geen een vector van 4 binaire getallen
+    C = Matrix([[1,1,1,0,0,0,0],[1,0,0,1,1,0,0],[0,1,0,1,0,1,0],[1,1,0,1,0,0,1]])
+    return C*invoer #Als uitvoer krijg je een vector met 7 binaire getallen, de originele 4 en de drie pariteitbits 
+
+def decodeer(invoer): #Als invoer, geef een vector van 7 binaire getallen
+    D = Matrix([[0,0,0,0],[0,0,0,0],[1,0,0,0],[0,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]])
+    return D*invoer #Als uitvoer worden het eerste, tweede en vierde getal verwijdert
+
+def corrigeren(invoer): #Als invoer, geef een vector van 7 getallen die voorkomt uit de codeer functie waar maximaal 1 bit in is veranderd 
+    R = Matrix([[1,0,0],[0,1,0],[1,1,0],[0,0,1],[1,0,1],[0,1,1],[1,1,1]])
+    if str(R*invoer) == str(Matrix([[0,0,0]])): 
+        return invoer #Als geen bit in de vector is verandert, krijg je de invoer terug   
+    else:  
+        locatie_fout = int(R*invoer.matrix[0][2] + R*invoer.matrix[0][1] + R*invoer.matrix[0][0], 2)
+        herstelling = Matrix([(locatie_fout-1)*[0]+[1]+(7-locatie_fout)*[0]])
+        return invoer + herstelling #Als er ergens een fout is gemaakt, wordt de locatie van deze fout gevonden en gecorrigeert
