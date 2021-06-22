@@ -56,25 +56,26 @@ class Matrix:
             raise ValueError('Matrices zijn niet vermenigvuldigbaar')
         
         return Matrix(product)
-        
     
     def nulmatrix(n, m):
         kolommen = n * [0]
         nulmatrix = m * [kolommen]
         return Matrix(nulmatrix)
 
-    def matrixappend(matrix, n, m):
+    def matrixappend(self, n, m):
         nieuwmatrix = []
-        print(matrix.matrix)
-        for kolom in range(matrix.dim[1]):
+        print(self.matrix)
+        for kolom in range(self.dim[1]):
             nieuwmatrix.append([])
-            for rij in range(matrix.dim[0]):
+            for rij in range(self.dim[0]):
                 if kolom == m and rij == n:
                     nieuwmatrix[kolom].append(1)
                 else:
-                    nieuwmatrix[kolom].append(matrix.matrix[kolom][rij])
+                    nieuwmatrix[kolom].append(self.matrix[kolom][rij])
     
         return Matrix(nieuwmatrix)
+    
+
 
     def maak_fouten(self, aantal): #invoer is een matrix c.q. vector met de te verzenden Hamming code
         indices = random.sample(range(self.dim[0]), k=aantal) #hier wordt bepaald waar de fouten komen
