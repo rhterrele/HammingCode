@@ -136,7 +136,7 @@ def decodeer(invoer): #Als invoer, geef een vector van 7 binaire getallen
 
 def corrigeren(invoer): #Als invoer, geef een vector van 7 getallen die voorkomt uit de codeer functie waar maximaal 1 bit in is veranderd 
     H = Matrix([[1,0,0],[0,1,0],[1,1,0],[0,0,1],[1,0,1],[0,1,1],[1,1,1]])
-    Nul = Matrix([lengte = len((H*invoer).matrix [0])*[0]])
+    Nul = Matrix([len((H*invoer).matrix [0])*[0]])
     if (H*invoer).matrix == Nul.matrix: 
         return invoer #Als geen bit in de vector is verandert, krijg je de invoer terug   
     else:  
