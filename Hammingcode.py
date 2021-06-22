@@ -140,7 +140,7 @@ def corrigeren(invoer): #Als invoer, geef een vector van 7 getallen die voorkomt
     if (H*invoer).matrix == Nul.matrix: 
         return invoer #Als geen bit in de vector is verandert, krijg je de invoer terug   
     else:  
-         locatie_fout = ''
+        locatie_fout = ''
         for i in range(0, len((R*invoer).matrix[0])): 
             locatie_fout += str((R*invoer).matrix[0][i])
         locatie_fout = int(locatie_fout[::-1],2) 
