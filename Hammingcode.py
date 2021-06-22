@@ -4,6 +4,7 @@ Created on Tue Jun  8 10:59:57 2021
 
 @author: reint
 """
+import random
 
 class Matrix:
     '''matrix'''
@@ -79,6 +80,15 @@ def matrixappend(matrix, n, m):
 t = nulmatrix(5,6)
 
 print(matrixappend(t, 2,3))
+
+def maak_fouten(self, aantal): #invoer is een matrix c.q. vector met de te verzenden Hamming code
+        indices = random.sample(range(self.dim[0]), k=aantal) #hier wordt bepaald waar de fouten komen
+        for i in indices:
+            if self.rijen[i][0]==0:
+                self.rijen[i][0]=1
+            else:
+                self.rijen[i][0]=0
+        return self #code met fouten, als matrix
 
 def codeer(invoer): #Als invoer, geen een vector van 4 binaire getallen
     C = Matrix([[1,1,1,0,0,0,0],[1,0,0,1,1,0,0],[0,1,0,1,0,1,0],[1,1,0,1,0,0,1]])
