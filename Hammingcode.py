@@ -90,9 +90,7 @@ def decodeer(invoer): #Als invoer, geef een vector van 7 binaire getallen
 
 def corrigeren(invoer): #Als invoer, geef een vector van 7 getallen die voorkomt uit de codeer functie waar maximaal 1 bit in is veranderd 
     R = Matrix([[1,0,0],[0,1,0],[1,1,0],[0,0,1],[1,0,1],[0,1,1],[1,1,1]])
-    lijst = (R*invoer).matrix 
-    lengte = len(lijst[0])
-    Nul = Matrix([lengte*[0]])
+    Nul = Matrix([lengte = len((R*invoer).matrix [0])*[0]])
     if (R*invoer).matrix == Nul.matrix: 
         return invoer #Als geen bit in de vector is verandert, krijg je de invoer terug   
     else:  
