@@ -86,10 +86,51 @@ class Matrix:
                 self.rijen[i][0]=0
         return self #code met fouten, als matrix
 
-t = nulmatrix(5,6)
-
-print(matrixappend(t, 2,3))
-
+class Matrix1:
+    '''Maakt een matrix met als input de dimensie van de matrix en de plekken waar de enen staan '''
+    
+    def __init__(self, dim=(1,1), posities=[]):
+        self.posities = posities
+        self.dim = dim
+        
+    def __str__(self):
+        string = ''
+        for rij in range(1, self.dim[0] + 1):
+            for kolom in range(1, self.dim[1] + 1):
+                if (rij, kolom) in self.posities:
+                    string += '1 '
+                else:
+                    string += '0 '
+            string += '\n'
+        return string
+        
+    def __add__(self, other):
+        if self.dim == other.dim:
+            somposities = []
+            for rij in range(1, self.dim[0] + 1):
+                for kolom in range(1, self.dim[1] + 1):
+                    if ((rij, kolom) in self.posities) ^ ((rij, kolom) in other.posities):
+                        somposities.append((rij, kolom))
+        else:
+            raise ValueError('Matrices zijn niet van dezelfde dimensie')
+        return Matrix1(self.dim, somposities)
+    
+    def __mul__(self, other):
+        if self.dim[1] == other.dim[0]:
+            productdim = (self.dim[0], other.dim[1])
+            productposities = []
+            for rij in range(1, productdim[0] + 1):
+                for kolom in range(1, productdim[1] + 1):
+                    som = 0
+                    for i in range(1, self.dim[1]+ 1):
+                        if ((rij, i) in self.posities) and ((i, kolom) in other.posities):
+                            som += 1
+                    if som%2 == 1:
+                        productposities.append((rij, kolom))
+        else:
+            raise ValueError('Matrices zijn niet vermenigvuldigbaar')
+        return Matrix1(productdim, productposities)
+            
 
     
  def Hamming_matrices(lengcode, lengbericht): #Ga ervanuit dat standaardmatrices geïmplementeerd zijn
