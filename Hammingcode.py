@@ -87,24 +87,32 @@ class Matrix:
         return self #code met fouten, als matrix
 
 class Matrix1:
-    '''Maakt een matrix met als input de dimensie van de matrix en de plekken waar de enen staan '''
+    '''Maakt een matrix met alleen maar 0 en 1 als elementen
     
-    def __init__(self, dim=(1,1), posities=[]):
+    Keyword arguments:
+    dim - De dimensie van de matrix (default 1x1)
+    posities - De plekken van de matrix waar er een 1 staat
+    
+    '''
+    
+    def __init__(self, dim=[1,1], posities=[]):
         self.posities = posities
         self.dim = dim
         
     def __str__(self):
+        #print de matrix door het in een grid te printen
         string = ''
         for rij in range(1, self.dim[0] + 1):
             for kolom in range(1, self.dim[1] + 1):
-                if (rij, kolom) in self.posities:
+                if (rij, kolom) in self.posities: #Als de positie in de lijst met posities met een 1 staat, print dan een 1
                     string += '1 '
-                else:
+                else: #Print elders een 0
                     string += '0 '
             string += '\n'
         return string
         
     def __add__(self, other):
+        # Telt twee matrices bij elkaar op doormiddel van een xor vergelijking tussen het elementen op plek (rij, kolom) van self en other, voor elke rij en elke kolom
         if self.dim == other.dim:
             somposities = []
             for rij in range(1, self.dim[0] + 1):
@@ -116,6 +124,7 @@ class Matrix1:
         return Matrix1(self.dim, somposities)
     
     def __mul__(self, other):
+        #Vermenigvuldigt twee matrices met elkaar
         if self.dim[1] == other.dim[0]:
             productdim = (self.dim[0], other.dim[1])
             productposities = []
