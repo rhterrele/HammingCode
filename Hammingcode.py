@@ -149,8 +149,24 @@ class Matrix1:
                 self.posities.append((i,1))
         return self #code met fouten (altijd in 1e kolom), als matrix    
 
-    
- def Hamming_matrices(lengcode, lengbericht): #Ga ervanuit dat standaardmatrices geïmplementeerd zijn
+def Hamming_matrix_H(lencode, lenbericht): #werkt met Matrix1
+    if lencode== 2**(lencode-lenbericht)-1: #standaard Hamming code
+        H= Matrix1([lencode-lenbericht, lencode]) 
+        for n in range( H.dim[0]): #gaat rijen langs
+            pbit= 2**n
+            for i in range(pbit, H.dim[1]+1, 2*pbit): #gaat elementen van rij n langs
+                for j in range(i, i+pbit): #maakt pbit achtereenvolgende elementen 1
+                    H.posities.append((n+1,j))
+    elif lencode== 2**(lencode-lenbericht-1): #Hamming code met extra parity bit
+        H= Hamming_matrix_H(lencode-1, lenbericht)
+        H.dim[0]+=1
+        for i in range(1, H.dim[1]+1):
+            H.posities.append((H.dim[0], i)) #vult laatste rij met enen
+    else:
+        raise ValueError('Waardes geven geen bestaande Hammingcode')
+    return H           
+ 
+def Hamming_matrices(lengcode, lengbericht): #werkt niet en is niet met Matrix1
     
     H= Matrix(lengcode-lengbericht, lengcode) #nulmatrix
     for n in range(H.dim[0]): #gaat rijen langs
