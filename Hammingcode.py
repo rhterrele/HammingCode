@@ -140,6 +140,14 @@ class Matrix1:
             raise ValueError('Matrices zijn niet vermenigvuldigbaar')
         return Matrix1(productdim, productposities)
             
+    def maak_fouten(self, aantal): #invoer is een matrix c.q. vector met de te verzenden Hamming code
+        indices = random.sample(range(1, self.dim[0]+1), k=aantal) #hier wordt bepaald waar de fouten komen
+        for i in indices:
+            if (i,1) in self.posities:
+                self.posities.remove((i,1))
+            else:
+                self.posities.append((i,1))
+        return self #code met fouten (altijd in 1e kolom), als matrix    
 
     
  def Hamming_matrices(lengcode, lengbericht): #Ga ervanuit dat standaardmatrices geïmplementeerd zijn
