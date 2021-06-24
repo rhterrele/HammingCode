@@ -132,8 +132,72 @@ class Matrix1:
         return Matrix1(productdim, productposities)
             
 
+def matrix_H(lencode, lenbericht): #kijkt of er fouten in de verstuurde code zijn
+    H= Matrix1([lencode-lenbericht, lencode]) 
+    for n in range( H.dim[0]): #gaat rijen langs
+        pbit= 2**n
+        for i in range(pbit, H.dim[1]+1, 2*pbit): #gaat elementen van rij n langs
+            for j in range(i, i+pbit): #maakt pbit achtereenvolgende elementen 1
+                H.posities.append((n+1,j))
+    return H
+
+def matrix_Hp(lencode, lenbericht): #H met extra paritybit
+    H= Hamming_matrix_H(lencode-1, lenbericht)
+    H.dim[0]+=1
+    for i in range(1, H.dim[1]+1):
+        H.posities.append((H.dim[0], i)) #vult laatste rij met enen
+    return H
+
+def matrix_G(lencode, lenbericht): #codeert bericht
+    G= Matrix1([lencode, lenbericht])
+    H_rij=1
+    for rij in range(1, G.dim[0]+1):
+        if rij== H_rij: #rijen voor parity bits
+            #gedoe met H
+            """Hier moet dus nog wat bij"""
+            H_rij= 2*H_rij
+        else: #identiteitsrijen
+            G.posities.append((rij,rij))
+    return G
+
+def matrix_Gp(lencode, lenbericht): #G met extra paritybit
+    G= Hamming_matrix_G(lencode-1, lenbericht)
+    G.dim[1]+=1
+    for i in range(1, G.dim[1]+1):
+        G.posities.append((G.dim[0], i)) #vult laatste rij met enen
+    return G
+
+def matrix_R(lencode, lenbericht): #vertaalt code terug naar het bericht, werkt ook met extra paritybit
+    R= Matrix1([lenbericht, lencode])
+    n=1
+    beginwaarde=1
+    for rij in range(1, R.dim[0]+1):
+        for kolom in range(beginwaarde, R.dim[1]+1):
+            if kolom==n:
+                n= 2*n
+            else:
+                R.posities.append((rij, kolom))
+                beginwaarde = kolom + 1
+                break
+    return R
     
- def Hamming_matrices(lengcode, lengbericht): #Ga ervanuit dat standaardmatrices geïmplementeerd zijn
+def Hamming_matrices(lencode, lenbericht): #als G af is zou dit in principe moeten werken volgens mij
+    tweemachten=[]
+    for i in range(lencode-lenbericht):
+        tweemachten.append(2**i)
+    if lencode== 2**(lencode-lenbericht)-1: #standaard Hamming code
+        H= matrix_H(lencode, lenbericht)
+        G= matrix_G(lencode, lenbericht)
+        R= matrix_R(lencode, lenbericht)
+    elif lencode== 2**(lencode-lenbericht-1): #Hamming code met extra parity bit
+        H= matrix_Hp(lencode, lenbericht)
+        G= matrix_Gp(lencode, lenbericht)
+        R= matrix_R(lencode, lenbericht)
+    else:
+        raise ValueError('Waardes geven geen bestaande Hammingcode')
+    return G, H, R
+
+ def Hamming_matricesfout(lengcode, lengbericht): #Ga ervanuit dat standaardmatrices geïmplementeerd zijn
     
     H= Matrix(lengcode-lengbericht, lengcode) #nulmatrix
     for n in range(H.dim[0]): #gaat rijen langs
