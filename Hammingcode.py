@@ -209,14 +209,16 @@ def decodeer(invoer): #Als invoer, geef een vector van 7 binaire getallen
     return D*invoer #Als uitvoer worden het eerste, tweede en vierde getal verwijdert
 
 def corrigeren(invoer): #Als invoer, geef een vector van 7 getallen die voorkomt uit de codeer functie waar maximaal 1 bit in is veranderd 
-    H = Matrix([[1,0,0],[0,1,0],[1,1,0],[0,0,1],[1,0,1],[0,1,1],[1,1,1]])
-    Nul = Matrix([len((H*invoer).matrix [0])*[0]])
-    if (H*invoer).matrix == Nul.matrix: 
-        return invoer #Als geen bit in de vector is verandert, krijg je de invoer terug   
-    else:  
-        locatie_fout = ''
-        for i in range(0, len((R*invoer).matrix[0])): 
-            locatie_fout += str((R*invoer).matrix[0][i])
+        H = Matrix1([3,7],[(1,1),(1,3),(1,5),(1,7),(2,2),(2,3),(2,6),(2,7),(3,4),(3,5),(3,6),(3,7)])
+        if (H*invoer).posities == Matrix1([(H*invoer).dim[0],1],).posities: 
+            return invoer #Als geen bit in de vector is verandert, krijg je de invoer terug   
+        else:  
+            locatie_fout = ''
+            for i in range(1, (H*invoer).dim[0]+1):  
+                if (i,1) in (H*invoer).posities: 
+                    locatie_fout += '1'
+                else: 
+                    locatie_fout += '0'
         locatie_fout = int(locatie_fout[::-1],2) 
-        herstelling = Matrix([(locatie_fout-1)*[0]+[1]+(len(invoer.matrix[0])-locatie_fout)*[0]])
-        return invoer + herstelling #Als er ergens een fout is gemaakt, wordt de locatie van deze fout gevonden en gecorrigeert
+        invoer += Matrix1([7,1],[(locatie_fout,1)])         
+        return invoer 
