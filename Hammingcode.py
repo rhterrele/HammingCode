@@ -200,6 +200,24 @@ def Hamming_matrices(lengcode, lengbericht): #werkt niet en is niet met Matrix1
                 j+=1
     return G, H
 
+def lengte_bepalen_bericht(invoer): #een functie die lengcode en lenbericht bepaald als de invoer een bericht is
+    for r in range(1, invoer.dim[0]+1): 
+        if 2**r-r-1 == invoer.dim[0]: 
+            lengbericht = 2**r-r-1
+            lengcode = 2**r-1
+            return  lengcode, lengbericht 
+    invoer.dim[0] += 1 
+    return lengte_bepalen_bericht(invoer)
+
+def lengte_bepalen_code(invoer): #een functie die lengcode en lenbericht bepaald als de invoer een code is
+    for r in range(1, invoer.dim[0]+1): 
+        if 2**r-1 == invoer.dim[0]: 
+            lengbericht = 2**r-r-1
+            lengcode = 2**r-1
+            return  lengcode, lengbericht 
+    invoer.dim[0] += 1 
+    return lengte_bepalen_code(invoer)
+
 def codeer(invoer): #Als invoer, geen een vector van 4 binaire getallen
     G = Matrix([[1,1,1,0,0,0,0],[1,0,0,1,1,0,0],[0,1,0,1,0,1,0],[1,1,0,1,0,0,1]])
     return G*invoer #Als uitvoer krijg je een vector met 7 binaire getallen, de originele 4 en de drie pariteitbits 
@@ -208,8 +226,9 @@ def decodeer(invoer): #Als invoer, geef een vector van 7 binaire getallen
     D = Matrix([[0,0,0,0],[0,0,0,0],[1,0,0,0],[0,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]])
     return D*invoer #Als uitvoer worden het eerste, tweede en vierde getal verwijdert
 
-def corrigeren(invoer): #Als invoer, geef een vector van 7 getallen die voorkomt uit de codeer functie waar maximaal 1 bit in is veranderd 
-        H = Matrix1([3,7],[(1,1),(1,3),(1,5),(1,7),(2,2),(2,3),(2,6),(2,7),(3,4),(3,5),(3,6),(3,7)])
+def corrigeren(invoer): #Als invoer, geef een vector die voorkomt uit de codeer functie met maximaal 1 fout erin. 
+        lengte = lengte_bepalen_code(invoer)
+        H = Hamming_matrix_H(lengte[0], lengte[1])
         if (H*invoer).posities == Matrix1([(H*invoer).dim[0],1],).posities: 
             return invoer #Als geen bit in de vector is verandert, krijg je de invoer terug   
         else:  
@@ -222,3 +241,4 @@ def corrigeren(invoer): #Als invoer, geef een vector van 7 getallen die voorkomt
         locatie_fout = int(locatie_fout[::-1],2) 
         invoer += Matrix1([7,1],[(locatie_fout,1)])         
         return invoer 
+
