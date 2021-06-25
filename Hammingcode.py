@@ -242,3 +242,86 @@ def corrigeren(invoer): #Als invoer, geef een vector die voorkomt uit de codeer 
         invoer += Matrix1([7,1],[(locatie_fout,1)])         
         return invoer 
 
+
+    
+    
+    
+    
+    
+'''Hieronder is allemaal met bits werken'''
+
+def bits_maaklijst(nibble, m): #Zet de informatiebits op de goede plekken in een lijst, zodat op de lege plekken de parity bits kunnen staan
+    lijst = [None] #De lijst met de eerste plek leeg voor de paritybit
+    nibbleplek = 0 #Houdt de plek in de nibble bij
+    for i in range(1, 2**m):
+        if math.log2(i).is_integer(): #Als i een 2-macht is, houd de plek leeg
+            lijst.append(None)
+        else: #Elders vul de bijbehorende waarde van de nibble in
+            lijst.append(nibble[nibbleplek])
+            nibbleplek += 1
+    return lijst
+
+
+def bits_codeer(bericht, m): #Vult de paritybits in voor een gegeven lijst. Invoer is het te versleutelen bericht en het aantal paritybits
+    for m in range(m): #Gaat langs alle parity bits
+        som = 0
+        for i in range(len(bericht)):
+            if (i%(2**(m+1)))//(2**m) == 1 and type(bericht[i]) == int: #Checkt voor de bits die horen bij de paritybit, en checkt of op die plaats een bit staat.
+                som = (som + bericht[i])%2
+        
+        bericht[2**m] = som
+        
+    totalesom = 0 #De som voor de paritybit die de parity van het hele bericht checkt
+        
+    for i in range(1, len(bericht)):
+        totalesom = (totalesom + bericht[i])%2
+    
+    bericht[0] = totalesom #De algemene paritybit wordt aangepast
+    
+    return bericht
+    
+def bits_maak_fouten(bericht, aantal): #invoer is een versleuteld bericht en het aantal gewilde fouten
+    indices = random.sample(range(len(bericht)), k=aantal) #hier wordt bepaald waar de fouten komen
+    for i in indices:
+        bericht[i] = (bericht[i] + 1)%2 #Flipt de waarde van de bit
+    return bericht #Stuurt terug het bericht met de fouten
+
+
+
+
+def bits_corrigeren(bericht): #Corrigeert de mogelijke fouten in een bericht. Invoer is het versleuteld bericht
+    aanbits = [] #De bits met een 1 in het bericht
+    for i in range(len(bericht)):
+        if bericht[i] == 1:
+            aanbits.append(i)
+    
+    print(aanbits)
+    
+    fout = reduce(lambda x, y: x ^ y, aanbits) #Gaat langs de plekken met een 1 (aanbits) en voert dan steeds een xor uit.
+    parity = reduce(lambda x, y: (x+y)%2, bericht) #Checkt de parity van het bericht
+    
+    print(parity)
+    
+    if fout != 0: #Als er een fout in het bericht wordt gedetecteerd
+        if parity != 0: #Als de parity ook fout is 
+            bericht[fout] = (bericht[fout] + 1)%2 #flipt de bit als daar de fout is
+            print('er was één fout, en die is weggehaald')
+        elif parity == 0: #Als er een fout is gedetecteerd, maar parity is nog steeds 0. Dan zijn er minstens twee fouten
+            print('er zijn minstens twee fouten')
+    else:
+        print('er is geen fout')
+        
+    return bericht
+    
+
+
+def bits_decodeer(bericht): #Zet het versleuteld bericht weer om in het normale bericht. Invoer is het versleuteld bericht
+
+    eindbericht = [] #Het bericht dat gestuurd wordt    
+
+    for i in range(1, len(bericht)):
+        if not math.log2(i).is_integer(): #Als i niet een 2-macht is, voeg die bit toe aan het eindbericht
+            eindbericht.append(bericht[i])
+    
+    return eindbericht
+    
