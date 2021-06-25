@@ -149,56 +149,84 @@ class Matrix1:
                 self.posities.append((i,1))
         return self #code met fouten (altijd in 1e kolom), als matrix    
 
-def Hamming_matrix_H(lencode, lenbericht): #werkt met Matrix1
+
+
+def matrix_H(lencode, lenbericht):
+    H= Matrix1([lencode-lenbericht, lencode]) 
+    for n in range( H.dim[0]): #gaat rijen langs
+        pbit= 2**n
+        for i in range(pbit, H.dim[1]+1, 2*pbit): #gaat elementen van rij n langs
+            for j in range(i, i+pbit): #maakt pbit achtereenvolgende elementen 1
+                H.posities.append((n+1,j))
+    return H
+
+def matrix_Hp(lencode, lenbericht):
+    H= matrix_H(lencode-1, lenbericht)
+    H.dim[0]+=1
+    for i in range(1, H.dim[1]+1):
+        H.posities.append((H.dim[0], i)) #vult laatste rij met enen
+    return H
+
+def matrix_G(lencode, lenbericht):
+    tweemachten=[]
+    for i in range(lencode-lenbericht):
+        tweemachten.append(2**i)
+    G= Matrix1([lencode, lenbericht])
+    H_rij=1 #geeft aan welke rij de eerstvolgende is die met een rij van H correspondeert
+    I_rij=1
+    for rij in range(1, G.dim[0]+1):
+        overgeslagen= 0
+        if rij== H_rij: #rijen voor parity bits
+            tweemacht=1
+            primlijst=[] #geeft een lijst met elementen van een rij van H
+            for i in range(rij, G.dim[0]+1, 2*rij): #gaat elementen van rij langs
+                for j in range(i, i+rij): #maakt rij achtereenvolgende elementen 1
+                    primlijst.append([rij,j])
+            for index in range(1, G.dim[0]+1):
+                if index == tweemacht:
+                    tweemacht = 2 * tweemacht
+                    overgeslagen+=1
+                elif [rij, index] in primlijst:
+                    G.posities.append((rij, index-overgeslagen))
+            H_rij= 2*H_rij
+        else: #identiteitsrijen
+            G.posities.append((rij, I_rij))
+            I_rij+=1
+    return G  
+
+def matrix_Gp(lencode, lenbericht):
+    G= matrix_G(lencode-1, lenbericht)
+    G.dim[0]+=1
+    for i in range(1, G.dim[1]+1):
+        G.posities.append((G.dim[0], i)) #vult laatste rij met enen
+    return G
+
+def matrix_R(lencode, lenbericht):
+    R= Matrix1([lenbericht, lencode])
+    n=1
+    beginwaarde=1
+    for rij in range(1, R.dim[0]+1):
+        for kolom in range(beginwaarde, R.dim[1]+1):
+            if kolom==n:
+                n= 2*n
+            else:
+                R.posities.append((rij, kolom))
+                beginwaarde = kolom + 1
+                break
+    return R
+
+def Hamming_matrices(lencode, lenbericht):
     if lencode== 2**(lencode-lenbericht)-1: #standaard Hamming code
-        H= Matrix1([lencode-lenbericht, lencode]) 
-        for n in range( H.dim[0]): #gaat rijen langs
-            pbit= 2**n
-            for i in range(pbit, H.dim[1]+1, 2*pbit): #gaat elementen van rij n langs
-                for j in range(i, i+pbit): #maakt pbit achtereenvolgende elementen 1
-                    H.posities.append((n+1,j))
+        H= matrix_H(lencode, lenbericht)
+        G= matrix_G(lencode, lenbericht)
+        R= matrix_R(lencode, lenbericht)
     elif lencode== 2**(lencode-lenbericht-1): #Hamming code met extra parity bit
-        H= Hamming_matrix_H(lencode-1, lenbericht)
-        H.dim[0]+=1
-        for i in range(1, H.dim[1]+1):
-            H.posities.append((H.dim[0], i)) #vult laatste rij met enen
+        H= matrix_Hp(lencode, lenbericht)
+        G= matrix_Gp(lencode, lenbericht)
+        R= matrix_R(lencode, lenbericht)
     else:
         raise ValueError('Waardes geven geen bestaande Hammingcode')
-    return H           
- 
-def Hamming_matrices(lengcode, lengbericht): #werkt niet en is niet met Matrix1
-    
-    H= Matrix(lengcode-lengbericht, lengcode) #nulmatrix
-    for n in range(H.dim[0]): #gaat rijen langs
-        pbit= 2**n
-        for i in range(pbit, H.dim[1], 2*pbit): #gaat elementen van rij n langs
-            for j in range(i, i+pbit): #maakt pbit achtereenvolgende elementen 1
-                H.rijen[n][j]=1
-    """Ik denk dat H werkt als de opzet van de klasse anders is, 
-    ik heb het nog niet getest."""
-    
-    G= Matrix(lengcode, lengbericht)
-    n=0 #houdt aantal keer pbit bij = rij van H
-    j=0 #houdt aantal keer databit bij
-    for k in range(lengcode):#ofwel aantal rijen
-        if k==2**n:
-            macht_in_rij=1
-            i_H=0
-            for i in range(lengbericht): #ofwel aantal kolommen
-                while i <= macht_in_rij:
-                    macht_in_rij = macht_in_rij * 2
-                    i_H+=1
-                G.rijen[k][i]=H.rijen[n][i_H]
-                    
-            """Denk dat G en H ongeveer kloppen, 
-            nog niet heel goed nagekeken of getest."""
-            n+=1
-        else:
-            for i in range(lengbericht):
-                if i==j:
-                    G.rijen[k][i]=1 #anders blijft 0, "eenheid"
-                j+=1
-    return G, H
+    return G, H, R
 
 def lengte_bepalen_bericht(invoer): #een functie die lengcode en lenbericht bepaald als de invoer een bericht is
     for r in range(1, invoer.dim[0]+1): 
