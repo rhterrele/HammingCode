@@ -251,8 +251,8 @@ def codeer(invoer): #Als invoer, geen een vector van 4 binaire getallen
     return G*invoer #Als uitvoer krijg je een vector met 7 binaire getallen, de originele 4 en de drie pariteitbits 
 
 def decodeer(invoer): #Als invoer, geef een vector van 7 binaire getallen
-    D = Matrix([[0,0,0,0],[0,0,0,0],[1,0,0,0],[0,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]])
-    return D*invoer #Als uitvoer worden het eerste, tweede en vierde getal verwijdert
+    R = Matrix([[0,0,0,0],[0,0,0,0],[1,0,0,0],[0,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]])
+    return R*invoer #Als uitvoer worden het eerste, tweede en vierde getal verwijdert
 
 def corrigeren(invoer): #Als invoer, geef een vector die voorkomt uit de codeer functie met maximaal 1 fout erin. 
         lengte = lengte_bepalen_code(invoer)
