@@ -278,29 +278,29 @@ def corrigeren(invoer): #Als invoer, geef een vector die voorkomt uit de codeer 
     
 '''Hieronder is allemaal met bits werken'''
 
-def bits_maaklijst(nibble, m): #Zet de informatiebits op de goede plekken in een lijst, zodat op de lege plekken de parity bits kunnen staan
+def bits_maaklijst(bericht, m): #Zet de informatiebits op de goede plekken in een lijst, zodat op de lege plekken de parity bits kunnen staan
     lijst = [None] #De lijst met de eerste plek leeg voor de paritybit
-    nibbleplek = 0 #Houdt de plek in de nibble bij
+    berichtplek = 0 #Houdt de plek in het bericht bij
     for i in range(1, 2**m):
         if math.log2(i).is_integer(): #Als i een 2-macht is, houd de plek leeg
             lijst.append(None)
-        else: #Elders vul de bijbehorende waarde van de nibble in
-            lijst.append(nibble[nibbleplek])
-            nibbleplek += 1
+        else: #Elders vul de bijbehorende waarde van het bericht in
+            lijst.append(bericht[berichtplek])
+            bericht += 1
     return lijst
 
 
 def bits_codeer(bericht, m): #Vult de paritybits in voor een gegeven lijst. Invoer is het te versleutelen bericht en het aantal paritybits
+    hammingbericht = bits_maaklijst(bericht, m) #Zet het bericht om in de goede format
     for m in range(m): #Gaat langs alle parity bits
         som = 0
-        for i in range(len(bericht)):
-            if (i%(2**(m+1)))//(2**m) == 1 and type(bericht[i]) == int: #Checkt voor de bits die horen bij de paritybit, en checkt of op die plaats een bit staat.
-                som = (som + bericht[i])%2
+        for i in range(len(hammingbericht)):
+            if (i%(2**(m+1)))//(2**m) == 1 and type(hammingbericht[i]) == int: #Checkt voor de bits die horen bij de paritybit, en checkt of op die plaats een bit staat.
+                som = (som + hammingbericht[i])%2
         
-        bericht[2**m] = som
+        hammingbericht[2**m] = som #past de paritybit aan
         
-    totalesom = 0 #De som voor de paritybit die de parity van het hele bericht checkt
-        
+    totalesom = 0 #De som voor de paritybit die de parity van het hele bericht checkt 
     for i in range(1, len(bericht)):
         totalesom = (totalesom + bericht[i])%2
     
@@ -323,12 +323,8 @@ def bits_corrigeren(bericht): #Corrigeert de mogelijke fouten in een bericht. In
         if bericht[i] == 1:
             aanbits.append(i)
     
-    print(aanbits)
-    
     fout = reduce(lambda x, y: x ^ y, aanbits) #Gaat langs de plekken met een 1 (aanbits) en voert dan steeds een xor uit.
     parity = reduce(lambda x, y: (x+y)%2, bericht) #Checkt de parity van het bericht
-    
-    print(parity)
     
     if fout != 0: #Als er een fout in het bericht wordt gedetecteerd
         if parity != 0: #Als de parity ook fout is 
