@@ -200,17 +200,16 @@ def matrix_Gp(lencode, lenbericht):
     for i in range(1, G.dim[1]+1):
         G.posities.append((G.dim[0], i)) #vult laatste rij met enen
     return G
-
 def matrix_R(lencode, lenbericht):
-    R= Matrix1([lenbericht, lencode])
+    R= Matrix1([lenbericht, lencode], [])
     n=1
     beginwaarde=1
     for rij in range(1, R.dim[0]+1):
         for kolom in range(beginwaarde, R.dim[1]+1):
-            if kolom==n:
-                n= 2*n
+            if n == kolom: 
+                n = 2*n
             else:
-                R.posities.append((rij, kolom))
+                R.posities += [(rij, kolom)]
                 beginwaarde = kolom + 1
                 break
     return R
