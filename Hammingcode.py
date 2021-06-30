@@ -227,6 +227,24 @@ def Hamming_matrices(lencode, lenbericht):
         raise ValueError('Waardes geven geen bestaande Hammingcode')
     return G, H, R
 
+def lengte_bepalen_bericht(invoer): #een functie die lengcode en lenbericht bepaald als de invoer een bericht is
+    for r in range(1, invoer.dim[0]+1): 
+        if 2**r-r-1 == invoer.dim[0]: 
+            lengbericht = 2**r-r-1
+            lengcode = 2**r-1
+            return  lengcode, lengbericht 
+    invoer.dim[0] += 1 
+    return lengte_bepalen_bericht(invoer)
+
+def lengte_bepalen_code(invoer): #een functie die lengcode en lenbericht bepaald als de invoer een code is
+    for r in range(1, invoer.dim[0]+1): 
+        if 2**r-1 == invoer.dim[0]: 
+            lengbericht = 2**r-r-1
+            lengcode = 2**r-1
+            return  lengcode, lengbericht 
+    invoer.dim[0] += 1 
+    return lengte_bepalen_code(invoer)
+
 def codeer(invoer): #Als invoer, geen een vector van 4 binaire getallen
     lengte = lengte_bepalen_bericht(invoer)
     G = matrix_G(lengte[0], lengte[1])
