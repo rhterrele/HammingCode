@@ -245,10 +245,65 @@ def lengte_bepalen_code(invoer): #een functie die lengcode en lenbericht bepaald
     invoer.dim[0] += 1 
     return lengte_bepalen_code(invoer)
 
+def matrix_Ge(invoer): 
+    Ge = Matrix1([invoer + 1, invoer], )
+    for i in range(1, invoer + 1): 
+        Ge.posities += [(i,i)]
+        Ge.posities += [(invoer+1, i)]
+    return Ge
+
+def matrix_He(invoer): 
+    He = Matrix1([1,invoer + 1], )
+    for i in range(1, invoer + 2):
+        He.posities += [(1,i)]
+    return He 
+
+def matrix_Re(invoer): 
+    Re = Matrix1([invoer, invoer + 1], )
+    for i in range(1, invoer + 1): 
+        Re.posities += [(i,i)]
+    return Re
+
+def codeer_extra(invoer): #Als invoer, geen een vector van 4 binaire getallen
+    lengte = lengte_bepalen_bericht(invoer)
+    G = matrix_G(lengte[0], lengte[1])
+    Ge = matrix_Ge(lengte[0])
+    return Ge*(G*invoer) #Als uitvoer krijg je een vector met 7 binaire getallen, de originele 4 en de drie pariteitbits 
+
+def decodeer_extra(invoer): #Als invoer, geef een vector van 7 binaire getallen
+    lengte = lengte_bepalen_code(invoer)
+    R = matrix_R(lengte[0], lengte[1])
+    Re = matrix_Re(lengte[0])
+    return R*(Re*invoer) #Als uitvoer worden het eerste, tweede en vierde getal verwijdert
+
+def corrigeren_extra(invoer): #Als invoer, geef een vector die voorkomt uit de codeer functie met maximaal 1 fout erin. 
+        lengte = lengte_bepalen_code(invoer)
+        H = matrix_H(lengte[0], lengte[1])
+        He = matrix_He(lengte[0])
+        Re = matrix_Re(lengte[0])
+        if (He*invoer).posities == Matrix1([1,1], ).posities: 
+            if (H*(Re*invoer)).posities == Matrix1([(H*(Re*invoer)).dim[0],1],).posities: 
+                return invoer #Als geen bit in de vector is verandert, krijg je de invoer terug   
+            else:  
+                return 'Er zijn twee fouten gemaakt'
+        else: 
+            if (H*(Re*invoer)).posities == Matrix1([(H*(Re*invoer)).dim[0],1],).posities: 
+                return invoer #Als geen bit in de vector is verandert, krijg je de invoer terug   
+            else:  
+                locatie_fout = ''
+                for i in range(1, (H*(Re*invoer)).dim[0]+1):  
+                    if (i,1) in (H*invoer).posities: 
+                        locatie_fout += '1'
+                    else: 
+                        locatie_fout += '0'
+            locatie_fout = int(locatie_fout[::-1],2) 
+            invoer += Matrix1([7,1],[(locatie_fout,1)])         
+            return invoer
+
 def codeer(invoer): #Als invoer, geen een vector van 4 binaire getallen
     lengte = lengte_bepalen_bericht(invoer)
     G = matrix_G(lengte[0], lengte[1])
-    return G*invoer #Als uitvoer krijg je een vector met 7 binaire getallen, de originele 4 en de drie pariteitbits 
+    return (G*invoer) #Als uitvoer krijg je een vector met 7 binaire getallen, de originele 4 en de drie pariteitbits 
 
 def decodeer(invoer): #Als invoer, geef een vector van 7 binaire getallen
     lengte = lengte_bepalen_code(invoer)
@@ -270,6 +325,7 @@ def corrigeren(invoer): #Als invoer, geef een vector die voorkomt uit de codeer 
         locatie_fout = int(locatie_fout[::-1],2) 
         invoer += Matrix1([7,1],[(locatie_fout,1)])         
         return invoer
+
 
 
     
