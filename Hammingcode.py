@@ -229,86 +229,86 @@ def Hamming_matrices(lencode, lenbericht):
 
 def lengte_bepalen_bericht(invoer): #een functie die lengcode en lenbericht bepaald als de invoer een bericht is
     for r in range(1, invoer.dim[0]+1): 
-        if 2**r-r-1 == invoer.dim[0]: 
+        if 2**r-r-1 == invoer.dim[0]: #Zoekt een r zodat hieraan wordt voldaan, als hij gevonden is, weten we zowel lencode, als lengbericht 
             lengbericht = 2**r-r-1
             lengcode = 2**r-1
             return  lengcode, lengbericht 
     invoer.dim[0] += 1 
-    return lengte_bepalen_bericht(invoer)
+    return lengte_bepalen_bericht(invoer) #Als hij niet gevonden is, doen we alsof de dimensie groter is en zoek we opnieuw 
 
 def lengte_bepalen_code(invoer): #een functie die lengcode en lenbericht bepaald als de invoer een code is
     for r in range(1, invoer.dim[0]+1): 
-        if 2**r-1 == invoer.dim[0]: 
+        if 2**r-1 == invoer.dim[0]: #Zoekt een r zodat hieraan wordt voldaan, als hij gevonden is, weten we zowel lencode, als lengbericht
             lengbericht = 2**r-r-1
             lengcode = 2**r-1
             return  lengcode, lengbericht 
     invoer.dim[0] += 1 
-    return lengte_bepalen_code(invoer)
+    return lengte_bepalen_code(invoer) #Als hij niet gevonden is, doen we alsof de dimensie groter is en zoek we opnieuw 
 
-def matrix_Ge(invoer): 
+def matrix_Ge(invoer): #Als invoer geef de lengte van de vector waarme je deze matrix mee wilt vermenigvuldigen  
     Ge = Matrix1([invoer + 1, invoer], )
     for i in range(1, invoer + 1): 
-        Ge.posities += [(i,i)]
-        Ge.posities += [(invoer+1, i)]
+        Ge.posities += [(i,i)] #Voegt op de diagonaal enen toe 
+        Ge.posities += [(invoer+1, i)] #Voegt op de onderste rij enen toe
     return Ge
 
-def matrix_He(invoer): 
+def matrix_He(invoer): #Als invoer geef de lengte van de vector waarme je deze matrix mee wilt vermenigvuldigen
     He = Matrix1([1,invoer + 1], )
-    for i in range(1, invoer + 2):
-        He.posities += [(1,i)]
+    for i in range(1, invoer + 2): 
+        He.posities += [(1,i)] #Voegt op elke locatie een 1 toe
     return He 
 
-def matrix_Re(invoer): 
+def matrix_Re(invoer): #Als invoer geef de lengte van de vector waarme je deze matrix mee wilt vermenigvuldigen 
     Re = Matrix1([invoer, invoer + 1], )
     for i in range(1, invoer + 1): 
-        Re.posities += [(i,i)]
+        Re.posities += [(i,i)] #Voegt op de diagonaal enen toe 
     return Re
 
-def codeer_extra(invoer): #Als invoer, geen een vector van 4 binaire getallen
+def codeer_extra(invoer): #Als invoer, geef een matrix in de vorm van een vector 
     lengte = lengte_bepalen_bericht(invoer)
     G = matrix_G(lengte[0], lengte[1])
     Ge = matrix_Ge(lengte[0])
-    return Ge*(G*invoer) #Als uitvoer krijg je een vector met 7 binaire getallen, de originele 4 en de drie pariteitbits 
+    return Ge*(G*invoer)  
 
-def decodeer_extra(invoer): #Als invoer, geef een vector van 7 binaire getallen
+def decodeer_extra(invoer): #Als invoer, geef een matrix in de vorm van een vector
     lengte = lengte_bepalen_code(invoer)
     R = matrix_R(lengte[0], lengte[1])
     Re = matrix_Re(lengte[0])
-    return R*(Re*invoer) #Als uitvoer worden het eerste, tweede en vierde getal verwijdert
+    return R*(Re*invoer) 
 
-def corrigeren_extra(invoer): #Als invoer, geef een vector die voorkomt uit de codeer functie met maximaal 1 fout erin. 
+def corrigeren_extra(invoer): #Als invoer, geef een vector die voorkomt uit de codeer functie met maximaal twee fouten erin 
         lengte = lengte_bepalen_code(invoer)
         H = matrix_H(lengte[0], lengte[1])
         He = matrix_He(lengte[0])
         Re = matrix_Re(lengte[0])
-        if (He*invoer).posities == Matrix1([1,1], ).posities: 
+        if (He*invoer).posities == Matrix1([1,1], ).posities: #Als de pariteit van alle bits hetzelfde is gebleven, is geen fout gemaakt, of twee  
             if (H*(Re*invoer)).posities == Matrix1([(H*(Re*invoer)).dim[0],1],).posities: 
                 return invoer #Als geen bit in de vector is verandert, krijg je de invoer terug   
             else:  
-                return 'Er zijn twee fouten gemaakt'
+                return print('Er zijn twee fouten gemaakt')
         else: 
-            if (H*(Re*invoer)).posities == Matrix1([(H*(Re*invoer)).dim[0],1],).posities: 
-                return invoer #Als geen bit in de vector is verandert, krijg je de invoer terug   
+            if (H*(Re*invoer)).posities == Matrix1([(H*(Re*invoer)).dim[0],1],).posities: #Als de pariteit wel verandert, is er 1 fout gemaakt
+                return invoer #Als er toch meer dan twee fouten zijn gemaakt en de regel hiervoor zegt van niet, dan wordt het originele bericht teruggegeven   
             else:  
                 locatie_fout = ''
-                for i in range(1, (H*(Re*invoer)).dim[0]+1):  
+                for i in range(1, (H*(Re*invoer)).dim[0]+1): #Als er een fout is gemaakt, geeft (H*(Re*invoer)) de locatie in binair 
                     if (i,1) in (H*invoer).posities: 
                         locatie_fout += '1'
                     else: 
                         locatie_fout += '0'
             locatie_fout = int(locatie_fout[::-1],2) 
-            invoer += Matrix1([7,1],[(locatie_fout,1)])         
-            return invoer
+            invoer += Matrix1([7,1],[(locatie_fout,1)]) #We tellen een vector met een 1 op de locatie van de fout op bij de invoer om de fout te corrigeren       
+            return invoer 
 
-def codeer(invoer): #Als invoer, geen een vector van 4 binaire getallen
+def codeer(invoer): #Als invoer, geef een matrix in de vorm van een vector
     lengte = lengte_bepalen_bericht(invoer)
     G = matrix_G(lengte[0], lengte[1])
-    return (G*invoer) #Als uitvoer krijg je een vector met 7 binaire getallen, de originele 4 en de drie pariteitbits 
+    return (G*invoer)  
 
-def decodeer(invoer): #Als invoer, geef een vector van 7 binaire getallen
+def decodeer(invoer): #Als invoer, geef een matrix in de vorm van een vector
     lengte = lengte_bepalen_code(invoer)
     R = matrix_R(lengte[0], lengte[1])
-    return R*invoer #Als uitvoer worden het eerste, tweede en vierde getal verwijdert
+    return R*invoer 
 
 def corrigeren(invoer): #Als invoer, geef een vector die voorkomt uit de codeer functie met maximaal 1 fout erin. 
         lengte = lengte_bepalen_code(invoer)
@@ -317,13 +317,13 @@ def corrigeren(invoer): #Als invoer, geef een vector die voorkomt uit de codeer 
             return invoer #Als geen bit in de vector is verandert, krijg je de invoer terug   
         else:  
             locatie_fout = ''
-            for i in range(1, (H*invoer).dim[0]+1):  
+            for i in range(1, (H*invoer).dim[0]+1): #Als er een fout is gemaakt, geeft (H*(Re*invoer)) de locatie in binair
                 if (i,1) in (H*invoer).posities: 
                     locatie_fout += '1'
                 else: 
                     locatie_fout += '0'
         locatie_fout = int(locatie_fout[::-1],2) 
-        invoer += Matrix1([7,1],[(locatie_fout,1)])         
+        invoer += Matrix1([7,1],[(locatie_fout,1)]) #We tellen een vector met een 1 op de locatie van de fout op bij de invoer om de fout te corrigeren      
         return invoer
 
 
