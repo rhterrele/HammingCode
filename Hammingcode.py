@@ -114,6 +114,7 @@ def matrix_H(lencode, lenbericht):
     elif lencode== 2**(lencode-lenbericht-1): #Hamming code met extra parity bit
         H= matrix_H(lencode-1, lenbericht)
         H.dim[0]+=1
+        H.dim[1]+=1
         for i in range(1, H.dim[1]+1):
             H.posities.append((H.dim[0], i)) #vult laatste rij met enen
     else:
