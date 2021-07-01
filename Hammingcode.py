@@ -8,88 +8,7 @@ import random
 import math
 from functools import reduce
 
-
 class Matrix:
-    '''matrix'''
-    
-    def __init__(self, lijst=[]):
-        self.matrix = lijst
-        self.dim = (len(lijst[0]), len(lijst))
-        self.kolommen = lijst
-        self.rijen =[]
-        for rij in range(self.dim[0]):
-            self.rijen.append([])
-            for i in range(self.dim[1]):
-                self.rijen[rij].append(lijst[i][rij])
-    
-        
-    def __str__(self):
-        string = ''
-        for rij in self.rijen:
-            for i in rij:
-                string += str(i) + ' '
-            string += '\n'
-        
-        return string
-    
-    def __add__(self, other):
-        
-        if self.dim == other.dim:
-            som = []
-            for i in range(self.dim[1]):
-                som.append([])
-                for j in range(self.dim[0]):
-                    som[i].append((self.matrix[i][j] + other.matrix[i][j]) % 2)
-        else:
-            raise ValueError('Matrices zijn niet van dezelfde dimensie')
-        return Matrix(som)
-        
-    def __mul__(self, other):
-        if int(self.dim[1]) == int(other.dim[0]):
-            product = []
-            
-            for kolom in range(other.dim[1]):
-                product.append([])
-                for rij in range(self.dim[0]):
-                    ijproduct = 0
-                    for i in range(self.dim[1]):
-                        ijproduct += self.rijen[rij][i] * other.kolommen[kolom][i]
-                    product[kolom].append(ijproduct%2)
-        else:
-            raise ValueError('Matrices zijn niet vermenigvuldigbaar')
-        
-        return Matrix(product)
-    
-    def nulmatrix(n, m):
-        kolommen = n * [0]
-        nulmatrix = m * [kolommen]
-        return Matrix(nulmatrix)
-
-    def matrixappend(self, n, m):
-        nieuwmatrix = []
-        print(self.matrix)
-        for kolom in range(self.dim[1]):
-            nieuwmatrix.append([])
-            for rij in range(self.dim[0]):
-                if kolom == m and rij == n:
-                    nieuwmatrix[kolom].append(1)
-                else:
-                    nieuwmatrix[kolom].append(self.matrix[kolom][rij])
-    
-        return Matrix(nieuwmatrix)
-    
-
-
-    def maak_fouten(self, aantal): #invoer is een matrix c.q. vector met de te verzenden Hamming code
-        indices = random.sample(range(self.dim[0]), k=aantal) #hier wordt bepaald waar de fouten komen
-        for i in indices:
-            if self.rijen[i][0]==0:
-                self.rijen[i][0]=1
-            else:
-                self.rijen[i][0]=0
-        return self #code met fouten, als matrix
-
-class Matrix1:
     '''Maakt een matrix met alleen maar 0 en 1 als elementen
     
     Keyword arguments:
@@ -124,7 +43,7 @@ class Matrix1:
                         somposities.append((rij, kolom))
         else:
             raise ValueError('Matrices zijn niet van dezelfde dimensie')
-        return Matrix1(self.dim, somposities)
+        return Matrix(self.dim, somposities)
     
     def __mul__(self, other):
         #Vermenigvuldigt twee matrices met elkaar
@@ -141,7 +60,7 @@ class Matrix1:
                         productposities.append((rij, kolom))
         else:
             raise ValueError('Matrices zijn niet vermenigvuldigbaar')
-        return Matrix1(productdim, productposities)
+        return Matrix(productdim, productposities)
             
     def maak_fouten(self, aantal): #invoer is een matrix c.q. vector met de te verzenden Hamming code
         indices = random.sample(range(1, self.dim[0]+1), k=aantal) #hier wordt bepaald waar de fouten komen
@@ -154,7 +73,7 @@ class Matrix1:
 
 def matrix_G(lencode, lenbericht):
     if lencode== 2**(lencode-lenbericht)-1: #standaard Hamming code
-        G= Matrix1([lencode, lenbericht])
+        G= Matrix([lencode, lenbericht])
         H_rij=1 #geeft aan welke rij de eerstvolgende is die met een rij van H correspondeert
         I_rij=1 #houdt bij de hoeveelste de volgende "identiteitsrij" is
         for rij in range(1, G.dim[0]+1):
@@ -186,7 +105,7 @@ def matrix_G(lencode, lenbericht):
 
 def matrix_H(lencode, lenbericht):
     if lencode== 2**(lencode-lenbericht)-1: #standaard Hamming code
-        H= Matrix1([lencode-lenbericht, lencode]) 
+        H= Matrix([lencode-lenbericht, lencode]) 
         for n in range( H.dim[0]): #gaat rijen langs
             pbit= 2**n
             for i in range(pbit, H.dim[1]+1, 2*pbit): #gaat elementen van rij n langs
@@ -203,7 +122,7 @@ def matrix_H(lencode, lenbericht):
 
 def matrix_R(lencode, lenbericht):
     if lencode== 2**(lencode-lenbericht)-1 or lencode== 2**(lencode-lenbericht-1): #standaard Hamming code of met extra paritybit
-        R= Matrix1([lenbericht, lencode], [])
+        R= Matrix([lenbericht, lencode], [])
         n=1
         beginwaarde=1
         for rij in range(1, R.dim[0]+1):
@@ -237,20 +156,20 @@ def lengte_bepalen_code(invoer): #een functie die lengcode en lenbericht bepaald
     return lengte_bepalen_code(invoer) #Als hij niet gevonden is, doen we alsof de dimensie groter is en zoek we opnieuw 
 
 def matrix_Ge(invoer): #Als invoer geef de lengte van de vector waarme je deze matrix mee wilt vermenigvuldigen  
-    Ge = Matrix1([invoer + 1, invoer], )
+    Ge = Matrix([invoer + 1, invoer], )
     for i in range(1, invoer + 1): 
         Ge.posities += [(i,i)] #Voegt op de diagonaal enen toe 
         Ge.posities += [(invoer+1, i)] #Voegt op de onderste rij enen toe
     return Ge
 
 def matrix_He(invoer): #Als invoer geef de lengte van de vector waarme je deze matrix mee wilt vermenigvuldigen
-    He = Matrix1([1,invoer + 1], )
+    He = Matrix([1,invoer + 1], )
     for i in range(1, invoer + 2): 
         He.posities += [(1,i)] #Voegt op elke locatie een 1 toe
     return He 
 
 def matrix_Re(invoer): #Als invoer geef de lengte van de vector waarme je deze matrix mee wilt vermenigvuldigen 
-    Re = Matrix1([invoer, invoer + 1], )
+    Re = Matrix([invoer, invoer + 1], )
     for i in range(1, invoer + 1): 
         Re.posities += [(i,i)] #Voegt op de diagonaal enen toe 
     return Re
@@ -272,13 +191,13 @@ def corrigeren_extra(invoer): #Als invoer, geef een vector die voorkomt uit de c
         H = matrix_H(lengte[0], lengte[1])
         He = matrix_He(lengte[0])
         Re = matrix_Re(lengte[0])
-        if (He*invoer).posities == Matrix1([1,1], ).posities: #Als de pariteit van alle bits hetzelfde is gebleven, is geen fout gemaakt, of twee  
-            if (H*(Re*invoer)).posities == Matrix1([(H*(Re*invoer)).dim[0],1],).posities: 
+        if (He*invoer).posities == Matrix([1,1], ).posities: #Als de pariteit van alle bits hetzelfde is gebleven, is geen fout gemaakt, of twee  
+            if (H*(Re*invoer)).posities == Matrix([(H*(Re*invoer)).dim[0],1],).posities: 
                 return invoer #Als geen bit in de vector is verandert, krijg je de invoer terug   
             else:  
                 return print('Er zijn twee fouten gemaakt')
         else: 
-            if (H*(Re*invoer)).posities == Matrix1([(H*(Re*invoer)).dim[0],1],).posities: #Als de pariteit wel verandert, is er 1 fout gemaakt
+            if (H*(Re*invoer)).posities == Matrix([(H*(Re*invoer)).dim[0],1],).posities: #Als de pariteit wel verandert, is er 1 fout gemaakt
                 return invoer #Als er toch meer dan twee fouten zijn gemaakt en de regel hiervoor zegt van niet, dan wordt het originele bericht teruggegeven   
             else:  
                 locatie_fout = ''
@@ -288,7 +207,7 @@ def corrigeren_extra(invoer): #Als invoer, geef een vector die voorkomt uit de c
                     else: 
                         locatie_fout += '0'
             locatie_fout = int(locatie_fout[::-1],2) 
-            invoer += Matrix1([7,1],[(locatie_fout,1)]) #We tellen een vector met een 1 op de locatie van de fout op bij de invoer om de fout te corrigeren       
+            invoer += Matrix([7,1],[(locatie_fout,1)]) #We tellen een vector met een 1 op de locatie van de fout op bij de invoer om de fout te corrigeren       
             return invoer 
 
 def codeer(invoer): #Als invoer, geef een matrix in de vorm van een vector
@@ -304,7 +223,7 @@ def decodeer(invoer): #Als invoer, geef een matrix in de vorm van een vector
 def corrigeren(invoer): #Als invoer, geef een vector die voorkomt uit de codeer functie met maximaal 1 fout erin. 
         lengte = lengte_bepalen_code(invoer)
         H = matrix_H(lengte[0], lengte[1])
-        if (H*invoer).posities == Matrix1([(H*invoer).dim[0],1],).posities: 
+        if (H*invoer).posities == Matrix([(H*invoer).dim[0],1],).posities: 
             return invoer #Als geen bit in de vector is verandert, krijg je de invoer terug   
         else:  
             locatie_fout = ''
@@ -314,7 +233,7 @@ def corrigeren(invoer): #Als invoer, geef een vector die voorkomt uit de codeer 
                 else: 
                     locatie_fout += '0'
         locatie_fout = int(locatie_fout[::-1],2) 
-        invoer += Matrix1([7,1],[(locatie_fout,1)]) #We tellen een vector met een 1 op de locatie van de fout op bij de invoer om de fout te corrigeren      
+        invoer += Matrix([7,1],[(locatie_fout,1)]) #We tellen een vector met een 1 op de locatie van de fout op bij de invoer om de fout te corrigeren      
         return invoer
 
 
