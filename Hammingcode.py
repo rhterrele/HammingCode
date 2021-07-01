@@ -329,6 +329,26 @@ def stringtobits(berichtstring): #Neemt de string van het bericht dat versleutel
         bitsstring += format(ord(i), '08b')
     return bitsstring
 
+
+
+def bitsopdelen(bitsstring, nibblelengte): #Neemt een string van bits, en het aantal paritybits(ofwel de gewilde hammingcode), en verdeelt de bits in geschikte nibbles voor de hammingcodes
+    if len(bitsstring)%(nibblelengte) != 0: #Als de lengte van de nibbles niet de lengte van de bitsstring deelt
+        extrabits = ((nibblelengte) - (len(bitsstring)%(nibblelengte))) # het aantal toegevoegde bits wordt onthouden
+        bitsstring += extrabits * '0' #Voegt nullen toe zodat de lengtes elkaar delen
+    else:
+        extrabits = 0
+    
+    bitslijst = [] #de lijst met de opgedeelde bits
+    for i in range(len(bitsstring)): #Verdeelt alle bits in bitsstring in een lijst van lijsten
+        if i%nibblelengte == 0:
+            bitslijst.append([])
+        bitslijst[i//nibblelengte].append(int(bitsstring[i]))
+    
+    return bitslijst, extrabits
+            
+
+
+
 def bitstostring(bitslijst, extrabits): #Neemt een lijst met opgedeelde bits, en voert de bijbehorende string uit
     bitsstring = ''
     for nibble in bitslijst:
@@ -353,23 +373,6 @@ def bitstostring(bitslijst, extrabits): #Neemt een lijst met opgedeelde bits, en
     return berichtstring
     
     
-
-
-def bitsopdelen(bitsstring, nibblelengte): #Neemt een string van bits, en het aantal paritybits(ofwel de gewilde hammingcode), en verdeelt de bits in geschikte nibbles voor de hammingcodes
-    if len(bitsstring)%(nibblelengte) != 0: #Als de lengte van de nibbles niet de lengte van de bitsstring deelt
-        extrabits = ((nibblelengte) - (len(bitsstring)%(nibblelengte))) # het aantal toegevoegde bits wordt onthouden
-        bitsstring += extrabits * '0' #Voegt nullen toe zodat de lengtes elkaar delen
-    else:
-        extrabits = 0
-    
-    bitslijst = [] #de lijst met de opgedeelde bits
-    for i in range(len(bitsstring)): #Verdeelt alle bits in bitsstring in een lijst van lijsten
-        if i%nibblelengte == 0:
-            bitslijst.append([])
-        bitslijst[i//nibblelengte].append(int(bitsstring[i]))
-    
-    return bitslijst, extrabits
-            
 
     
 
