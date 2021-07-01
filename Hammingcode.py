@@ -5,6 +5,9 @@ Created on Tue Jun  8 10:59:57 2021
 @author: reint
 """
 import random
+import math
+from functools import reduce
+
 
 class Matrix:
     '''matrix'''
