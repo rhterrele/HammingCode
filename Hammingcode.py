@@ -316,3 +316,88 @@ def bits_decodeer(bericht): #Zet het versleuteld bericht weer om in het normale 
     
     return eindbericht
     
+
+    
+    
+    
+    
+'''Hieronder het omzetten van een string naar een bits'''
+
+def stringtobits(berichtstring): #Neemt de string van het bericht dat versleuteld moet worden, en geeft terug de string van de binaire representatie van de string van het bericht
+    bitsstring = '' 
+    for i in berichtstring:
+        bitsstring += format(ord(i), '08b')
+    return bitsstring
+
+def bitstostring(bitslijst, extrabits): #Neemt een lijst met opgedeelde bits, en voert de bijbehorende string uit
+    bitsstring = ''
+    for nibble in bitslijst:
+        for i in nibble:
+            bitsstring += str(i)
+            
+    bitsstring = bitsstring[:(len(bitsstring) - extrabits)] #Haalt de toegevoegde bits weg
+
+    
+    
+    byteslijst = [] #Lijst met bytes van de bitsstring
+    for byte in range(len(bitsstring)//8): #deelt bitsstring op in bytes, zodat die terug naar ascii karakters kunnen worden teruggezet
+        byteslijst.append('')
+        for i in range((byte*8), ((byte+1)*8)):
+            byteslijst[byte] += bitsstring[i]
+    
+    
+    berichtstring = ''
+    for byte in byteslijst: #Voert iedere byte om naar het bijbehorende ascii karakter
+        berichtstring += chr(int(byte, 2))
+
+    return berichtstring
+    
+    
+
+
+def bitsopdelen(bitsstring, nibblelengte): #Neemt een string van bits, en het aantal paritybits(ofwel de gewilde hammingcode), en verdeelt de bits in geschikte nibbles voor de hammingcodes
+    if len(bitsstring)%(nibblelengte) != 0: #Als de lengte van de nibbles niet de lengte van de bitsstring deelt
+        extrabits = ((nibblelengte) - (len(bitsstring)%(nibblelengte))) # het aantal toegevoegde bits wordt onthouden
+        bitsstring += extrabits * '0' #Voegt nullen toe zodat de lengtes elkaar delen
+    else:
+        extrabits = 0
+    
+    bitslijst = [] #de lijst met de opgedeelde bits
+    for i in range(len(bitsstring)): #Verdeelt alle bits in bitsstring in een lijst van lijsten
+        if i%nibblelengte == 0:
+            bitslijst.append([])
+        bitslijst[i//nibblelengte].append(int(bitsstring[i]))
+    
+    return bitslijst, extrabits
+            
+
+    
+
+def main():
+    berichtstring = input('Voer de string in: ')
+    m = int(input('hoeveel paritybits? '))
+    methode = int(input('welke methode? 1 voor matrix, 2 voor bits:'))
+    
+    bitsstring = stringtobits(berichtstring)
+    bitslijst, extrabits = (bitsopdelen(bitsstring, 2**m - m - 1))
+    
+    print(extrabits)
+    print(bitslijst)
+    
+    if methode == 1:
+        print('1')
+    elif methode == 2:
+        versleuteldbitslijst = []
+        for nibble in bitslijst:
+            versleuteldbitslijst.append(bits_codeer(nibble, m)) #codeert alle nibbles
+        
+        
+        for nibble in range(len(versleuteldbitslijst)): #corrigeert de mogelijke fouten
+            versleuteldbitslijst[nibble] = bits_corrigeren(versleuteldbitslijst[nibble])
+        
+        
+        eindbitslijst = []
+        for nibble in versleuteldbitslijst: #Decodeert alle nibbles
+            eindbitslijst.append(bits_decodeer(nibble))
+        
+        
