@@ -390,6 +390,15 @@ def main():
     
     if methode == 1:
         print('1')
+        vectorlijst = []
+        for nibble in bitslijst: #zet nibbles om in vectoren
+            nibblevector= Matrix([len(nibble), 1])
+            for i in range(len(nibble)):
+                if nibble[i]==1:
+                    nibblevector.posities.append(i+1, 1)
+            vectorlijst.append(nibblevector)
+        for nibblevector in vectorlijst:
+            codeer()
     elif methode == 2:
         versleuteldbitslijst = []
         for nibble in bitslijst:
