@@ -96,12 +96,18 @@ def matrix_G(lencode, lenbericht):
                 I_rij+=1
     elif lencode== 2**(lencode-lenbericht-1): #Hamming code met extra parity bit 
         G= matrix_G(lencode-1, lenbericht)
-        G.dim[0]+=1
-        for i in range(1, G.dim[1]+1):
-            G.posities.append((G.dim[0], i)) #vult laatste rij met enen
+        G_ep= matrix_G_extra_paritybit(lencode)
+        G= G_ep * G
     else:
         raise ValueError('Waardes geven geen bestaande Hammingcode')
     return G  
+
+def matrix_G_extra_paritybit(lencode):
+    G_ep= Matrix([lencode, lencode-1])
+    for rij in range(1, lencode): #identiteitsmatrix voor code
+        G_ep.posities.append((rij, rij))
+    for kolom in range(1, lencode): #laatste rij vol met enen voor pariteitsbit
+        G_ep.posities.append((lencode, kolom))
 
 def matrix_H(lencode, lenbericht):
     if lencode== 2**(lencode-lenbericht)-1: #standaard Hamming code
