@@ -177,15 +177,12 @@ def corrigeren_extra(invoer, lencode, lenbericht): #Als invoer, geef een vector 
             else:  
                 return print('Er zijn twee fouten gemaakt')
         else: 
-            if (H*(Re*invoer)).posities == Matrix([(H*(Re*invoer)).dim[0],1],).posities: #Als de pariteit wel verandert, is er 1 fout gemaakt
-                return invoer #Als er toch meer dan twee fouten zijn gemaakt en de regel hiervoor zegt van niet, dan wordt het originele bericht teruggegeven   
-            else:  
-                locatie_fout = ''
-                for i in range(1, (H*(Re*invoer)).dim[0]+1): #Als er een fout is gemaakt, geeft (H*(Re*invoer)) de locatie in binair 
-                    if (i,1) in (H*invoer).posities: 
-                        locatie_fout += '1'
-                    else: 
-                        locatie_fout += '0'
+            locatie_fout = ''
+            for i in range(1, (H*(Re*invoer)).dim[0]+1): #Als er een fout is gemaakt, geeft (H*(Re*invoer)) de locatie in binair 
+                if (i,1) in (H*invoer).posities: 
+                    locatie_fout += '1'
+                else: 
+                    locatie_fout += '0'
             locatie_fout = int(locatie_fout[::-1],2) 
             invoer += Matrix([7,1],[(locatie_fout,1)]) #We tellen een vector met een 1 op de locatie van de fout op bij de invoer om de fout te corrigeren       
             return invoer 
