@@ -193,13 +193,24 @@ def corrigeren_extra(invoer, lencode, lenbericht): #Als invoer, geef een vector 
             invoer += Matrix([7,1],[(locatie_fout,1)]) #We tellen een vector met een 1 op de locatie van de fout op bij de invoer om de fout te corrigeren       
             return invoer 
 
-def codeer(invoer, lencode, lenbericht): #Als invoer, geef een matrix in de vorm van een vector
+def codeer(nibble, lencode, lenbericht): #Als invoer, geef een string met bits en de gewenste Hamming code
+    nibblevector = Matrix([len(nibble), 1])
+    for i in range(len(nibble)): # maakt een vector zodat matrixvermenigvuldiging kan
+        if nibble[i]==1:
+        nibblevector.posities.append(i+1, 1)
     G = matrix_G(lencode, lenbericht)
-    return (G*invoer)  
+    return (G*nibblevector)  
 
 def decodeer(invoer, lencode, lenbericht): #Als invoer, geef een matrix in de vorm van een vector
     R = matrix_R(lencode, lenbericht)
-    return R*invoer 
+    nibblevector = R*invoer
+    for i in range(len(invoer)): #maakt er een string bits van
+        nibble = ''
+        if (i, 1) in nibblevector.posities:
+            nibble += '1'
+        else:
+            nibble += '0'
+    return nibble 
 
 def corrigeren(invoer, lencode, lenbericht): #Als invoer, geef een vector die voorkomt uit de codeer functie met maximaal 1 fout erin. 
         H = matrix_H(lencode, lenbericht)
@@ -362,16 +373,21 @@ def main():
     bitslijst, extrabits = (bitsopdelen(bitsstring, 2**m - m - 1))
     
     if methode == 1:
-        print('1')
-        vectorlijst = []
-        for nibble in bitslijst: #zet nibbles om in vectoren
-            nibblevector= Matrix([len(nibble), 1])
-            for i in range(len(nibble)):
-                if nibble[i]==1:
-                    nibblevector.posities.append(i+1, 1)
-            vectorlijst.append(nibblevector)
-        for nibblevector in vectorlijst:
-            codeer()
+        versleuteldvectorlijst = []
+        for nibble in bitslijst:
+            versleuteldvectorlijst.append(codeer(nibble, len(nibble) + m, len(nibble))) #codeert alle nibbles
+            
+        vectorenfouten = random.choices(range(len(versleuteldvectorlijst)), k=fouten) #Kiest willekeurig in welke gecodeerde vectoren de fouten plaats zullen vinden
+        for vector in vectorenfouten:
+            versleuteldvectorlijst[vector] = maak_fouten(versleuteldvectorlijst[vector], 1) #Maakt voor elke vector in de willekeurig gekozen lijst 1 fout. Een vector kan meerdere fouten krijgen door meerdere keren in de lijst voor te komen
+        
+        for nibble in range(len(versleuteldvectorlijst)): #corrigeert de mogelijke fouten
+            versleuteldvectorlijst[nibble] = corrigeren(versleuteldvectorlijst[nibble])
+            
+        eindbitslijst = []
+        for nibblevector in versleuteldvectorlijst: #decodeert alle vectoren
+            eindbitslijst.append(decodeer(nibblevector, len(nibblevector), len(nibblevector)-m))
+            
     elif methode == 2:
         versleuteldbitslijst = []
         for nibble in bitslijst:
@@ -389,4 +405,4 @@ def main():
         for nibble in versleuteldbitslijst: #Decodeert alle nibbles
             eindbitslijst.append(bits_decodeer(nibble))
         
-        print('Het bericht aan het eind van het proces is: ', bitstostring(eindbitslijst, extrabits))
+    print('Het bericht aan het eind van het proces is: ', bitstostring(eindbitslijst, extrabits))
