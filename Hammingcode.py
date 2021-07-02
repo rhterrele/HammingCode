@@ -83,12 +83,12 @@ def matrix_G(lencode, lenbericht):
                 primlijst=[] #geeft een lijst met elementen van een rij van H (primitief)
                 for i in range(rij, G.dim[0]+1, 2*rij): #gaat elementen van rij langs
                     for j in range(i, i+rij): #maakt rij achtereenvolgende elementen 1
-                        primlijst.append([rij,j])
+                        primlijst.append(j)
                 for index in range(1, G.dim[0]+1):
                     if index == tweemacht:
                         tweemacht = 2 * tweemacht
                         overgeslagen+=1
-                    elif [rij, index] in primlijst:
+                    elif index in primlijst:
                         G.posities.append((rij, index-overgeslagen))
                 H_rij= 2*H_rij
             else: #identiteitsrijen
