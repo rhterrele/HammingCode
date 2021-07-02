@@ -382,7 +382,7 @@ def bitstostring(bitslijst, extrabits): #Neemt een lijst met opgedeelde bits, en
 
 def main():
     berichtstring = input('Voer de string in: ')
-    m = int(input('hoeveel paritybits? '))
+    m = int(input('hoeveel paritybits? (exclusief de extra paritybit, die zit er altijd bij) '))
     methode = int(input('welke methode? 1 voor matrix, 2 voor bits:'))
     
     bitsstring = stringtobits(berichtstring)
