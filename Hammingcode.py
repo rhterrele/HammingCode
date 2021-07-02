@@ -361,6 +361,7 @@ def main():
     berichtstring = input('Voer de string in: ')
     m = int(input('hoeveel paritybits? (exclusief de extra paritybit, die zit er altijd bij) '))
     methode = int(input('welke methode? 1 voor matrix, 2 voor bits:'))
+    fouten = int(input('Hoeveel fouten?'))
     
     bitsstring = stringtobits(berichtstring)
     bitslijst, extrabits = (bitsopdelen(bitsstring, 2**m - m - 1))
