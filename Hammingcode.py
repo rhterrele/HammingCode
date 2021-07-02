@@ -217,13 +217,10 @@ def corrigeren(invoer, lencode, lenbericht): #Als invoer, geef een vector die vo
         return invoer
 
 
-
     
     
     
     
-    
-'''Hieronder is allemaal met bits werken'''
 
 def bits_maaklijst(bericht, m): #Zet de informatiebits op de goede plekken in een lijst, zodat op de lege plekken de parity bits kunnen staan
     lijst = [None] #De lijst met de eerste plek leeg voor de paritybit
@@ -298,13 +295,10 @@ def bits_decodeer(bericht): #Zet het versleuteld bericht weer om in het normale 
             eindbericht.append(bericht[i])
     
     return eindbericht
-    
 
-    
-    
-    
-    
-'''Hieronder het omzetten van een string naar een bits'''
+
+
+
 
 def stringtobits(berichtstring): #Neemt de string van het bericht dat versleuteld moet worden, en geeft terug de string van de binaire representatie van de string van het bericht
     bitsstring = '' 
