@@ -291,7 +291,10 @@ def bits_corrigeren(bericht): #Corrigeert de mogelijke fouten in een bericht. In
         if bericht[i] == 1:
             aanbits.append(i)
     
-    fout = reduce(lambda x, y: x ^ y, aanbits) #Gaat langs de plekken met een 1 (aanbits) en voert dan steeds een xor uit.
+    if aanbits: #checkt of aanbits niet leeg is
+        fout = reduce(lambda x, y: x ^ y, aanbits) #Gaat langs de plekken met een 1 (aanbits) en voert dan steeds een xor uit.
+    else:
+        fout = 0
     parity = reduce(lambda x, y: (x+y)%2, bericht) #Checkt de parity van het bericht
     
     if fout != 0: #Als er een fout in het bericht wordt gedetecteerd
@@ -385,9 +388,6 @@ def main():
     bitsstring = stringtobits(berichtstring)
     bitslijst, extrabits = (bitsopdelen(bitsstring, 2**m - m - 1))
     
-    print(extrabits)
-    print(bitslijst)
-    
     if methode == 1:
         print('1')
     elif methode == 2:
@@ -395,6 +395,9 @@ def main():
         for nibble in bitslijst:
             versleuteldbitslijst.append(bits_codeer(nibble, m)) #codeert alle nibbles
         
+        nibblesfouten = random.choices(range(len(versleuteldbitslijst)), k=fouten) #Kiest willekeurig in welke nibbles de fouten plaats zullen vinden
+        for nibble in nibblesfouten:
+            versleuteldbitslijst[nibble] = bits_maak_fouten(versleuteldbitslijst[nibble], 1) #Maakt voor elke nibble in de willekeurig gekozen lijst 1 fout. Een nibble kan meerdere fouten krijgen door meerdere keren in de lijst voor te komen
         
         for nibble in range(len(versleuteldbitslijst)): #corrigeert de mogelijke fouten
             versleuteldbitslijst[nibble] = bits_corrigeren(versleuteldbitslijst[nibble])
@@ -404,4 +407,4 @@ def main():
         for nibble in versleuteldbitslijst: #Decodeert alle nibbles
             eindbitslijst.append(bits_decodeer(nibble))
         
-        
+        print('Het bericht aan het eind van het proces is: ', bitstostring(eindbitslijst, extrabits))
