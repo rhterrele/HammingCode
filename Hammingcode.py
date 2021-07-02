@@ -138,24 +138,6 @@ def matrix_R(lencode, lenbericht):
         raise ValueError('Waardes geven geen bestaande Hammingcode')
     return R
 
-def lengte_bepalen_bericht(invoer): #een functie die lengcode en lenbericht bepaald als de invoer een bericht is
-    for r in range(1, invoer.dim[0]+1): 
-        if 2**r-r-1 == invoer.dim[0]: #Zoekt een r zodat hieraan wordt voldaan, als hij gevonden is, weten we zowel lencode, als lengbericht 
-            lengbericht = 2**r-r-1
-            lengcode = 2**r-1
-            return  lengcode, lengbericht 
-    invoer.dim[0] += 1 
-    return lengte_bepalen_bericht(invoer) #Als hij niet gevonden is, doen we alsof de dimensie groter is en zoek we opnieuw 
-
-def lengte_bepalen_code(invoer): #een functie die lengcode en lenbericht bepaald als de invoer een code is
-    for r in range(1, invoer.dim[0]+1): 
-        if 2**r-1 == invoer.dim[0]: #Zoekt een r zodat hieraan wordt voldaan, als hij gevonden is, weten we zowel lencode, als lengbericht
-            lengbericht = 2**r-r-1
-            lengcode = 2**r-1
-            return  lengcode, lengbericht 
-    invoer.dim[0] += 1 
-    return lengte_bepalen_code(invoer) #Als hij niet gevonden is, doen we alsof de dimensie groter is en zoek we opnieuw 
-
 def matrix_Ge(invoer): #Als invoer geef de lengte van de vector waarme je deze matrix mee wilt vermenigvuldigen  
     Ge = Matrix([invoer + 1, invoer], )
     for i in range(1, invoer + 1): 
@@ -175,23 +157,20 @@ def matrix_Re(invoer): #Als invoer geef de lengte van de vector waarme je deze m
         Re.posities += [(i,i)] #Voegt op de diagonaal enen toe 
     return Re
 
-def codeer_extra(invoer): #Als invoer, geef een matrix in de vorm van een vector 
-    lengte = lengte_bepalen_bericht(invoer)
-    G = matrix_G(lengte[0], lengte[1])
-    Ge = matrix_Ge(lengte[0])
+def codeer_extra(invoer, lenbericht, lencode): #Als invoer, geef een matrix in de vorm van een vector 
+    G = matrix_G(lencode, lenbericht)
+    Ge = matrix_Ge(lencode)
     return Ge*(G*invoer)  
 
-def decodeer_extra(invoer): #Als invoer, geef een matrix in de vorm van een vector
-    lengte = lengte_bepalen_code(invoer)
-    R = matrix_R(lengte[0], lengte[1])
-    Re = matrix_Re(lengte[0])
+def decodeer_extra(invoer, lencode, lenbericht): #Als invoer, geef een matrix in de vorm van een vector
+    R = matrix_R(lencode, lenbericht)
+    Re = matrix_Re(lencode)
     return R*(Re*invoer) 
 
-def corrigeren_extra(invoer): #Als invoer, geef een vector die voorkomt uit de codeer functie met maximaal twee fouten erin 
-        lengte = lengte_bepalen_code(invoer)
-        H = matrix_H(lengte[0], lengte[1])
-        He = matrix_He(lengte[0])
-        Re = matrix_Re(lengte[0])
+def corrigeren_extra(invoer, lencode, lenbericht): #Als invoer, geef een vector die voorkomt uit de codeer functie met maximaal twee fouten erin 
+        H = matrix_H(lencode, lenbericht)
+        He = matrix_He(lencode)
+        Re = matrix_Re(lencode)
         if (He*invoer).posities == Matrix([1,1], ).posities: #Als de pariteit van alle bits hetzelfde is gebleven, is geen fout gemaakt, of twee  
             if (H*(Re*invoer)).posities == Matrix([(H*(Re*invoer)).dim[0],1],).posities: 
                 return invoer #Als geen bit in de vector is verandert, krijg je de invoer terug   
@@ -211,19 +190,16 @@ def corrigeren_extra(invoer): #Als invoer, geef een vector die voorkomt uit de c
             invoer += Matrix([7,1],[(locatie_fout,1)]) #We tellen een vector met een 1 op de locatie van de fout op bij de invoer om de fout te corrigeren       
             return invoer 
 
-def codeer(invoer): #Als invoer, geef een matrix in de vorm van een vector
-    lengte = lengte_bepalen_bericht(invoer)
-    G = matrix_G(lengte[0], lengte[1])
+def codeer(invoer, lencode, lenbericht): #Als invoer, geef een matrix in de vorm van een vector
+    G = matrix_G(lencode, lenbericht)
     return (G*invoer)  
 
-def decodeer(invoer): #Als invoer, geef een matrix in de vorm van een vector
-    lengte = lengte_bepalen_code(invoer)
-    R = matrix_R(lengte[0], lengte[1])
+def decodeer(invoer, lencode, lenbericht): #Als invoer, geef een matrix in de vorm van een vector
+    R = matrix_R(lencode, lenbericht)
     return R*invoer 
 
-def corrigeren(invoer): #Als invoer, geef een vector die voorkomt uit de codeer functie met maximaal 1 fout erin. 
-        lengte = lengte_bepalen_code(invoer)
-        H = matrix_H(lengte[0], lengte[1])
+def corrigeren(invoer, lencode, lenbericht): #Als invoer, geef een vector die voorkomt uit de codeer functie met maximaal 1 fout erin. 
+        H = matrix_H(lencode, lenbericht)
         if (H*invoer).posities == Matrix([(H*invoer).dim[0],1],).posities: 
             return invoer #Als geen bit in de vector is verandert, krijg je de invoer terug   
         else:  
@@ -384,16 +360,6 @@ def main():
     berichtstring = input('Voer de string in: ')
     m = int(input('hoeveel paritybits? (exclusief de extra paritybit, die zit er altijd bij) '))
     methode = int(input('welke methode? 1 voor matrix, 2 voor bits:'))
-    fouten = int(input('Hoeveel fouten? '))
-    
-    if m < 2:
-        raise ValueError('Er moeten minimaal 2 paritybits zijn, exclusief de extra paritybit')
-    
-    if methode != 1 and methode != 2:
-        raise ValueError('Methode moet 1 of 2 zijn')
-    
-    if fouten < 0:
-        raise ValueError('Er kan geen negatief aantal fouten zijn')
     
     bitsstring = stringtobits(berichtstring)
     bitslijst, extrabits = (bitsopdelen(bitsstring, 2**m - m - 1))
